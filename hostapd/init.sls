@@ -3,12 +3,16 @@
 {% from "hostapd/map.jinja" import map with context %}
 
 # Install packages
+{%- if map.pkgs is defined %}
 hostapd_pkgs:
   pkg.installed:
     - pkgs:
       {% for pkg in map.pkgs %}
       - {{ pkg }}
       {% endfor %}
+    - require_in:
+      - service: hostapd_service
+{%- endif %}      
 
 {%- if map.defaults_file is defined %}
 hostapd_activate:
@@ -22,8 +26,6 @@ hostapd_service:
   service.running:
     - name: {{ map.service }}
     - enable: True
-    - require:
-      - pkg: hostapd_pkgs
 
 # Deploy hostapd.conf
 hostapd_config:

@@ -17,7 +17,7 @@ hostapd_activate:
     - text: DAEMON_CONF="{{ map.conf_dir }}/{{ map.conf_file }}"  
 {%- endif %}      
 
-# Ensure ssh service is running and autostart is enabled
+# Ensure hostapd service is running and autostart is enabled
 hostapd_service:
   service.running:
     - name: {{ map.service }}

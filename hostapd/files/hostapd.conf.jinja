@@ -7,13 +7,21 @@ bridge={{ card_data.bridge }}
 {%- endif %}
 hw_mode={{ card_data.get('hw_mode', 'g') }}
 channel={{ card_data.get('channel', '10') }}
-ieee80211d={{ card_data.get('ieee80211d', '1') }}
-country_code={{ card_data.get('country_code', 'DE') }}
-ieee80211n={{ card_data.get('ieee80211n', '1') }}
-wmm_enabled={{ card_data.get('wmm_enabled', '1') }}
+{%- if card_data.ieee80211d is defined %}
+ieee80211d={{ card_data.get('ieee80211d') }}
+{%- endif %}
+{%- if card_data.country_code is defined %}
+country_code={{ card_data.get('country_code') }}
+{%- endif %}
+{%- if card_data.ieee80211n is defined %}
+ieee80211n={{ card_data.get('ieee80211n') }}
+{%- endif %}
+{%- if card_data.wmm_enabled is defined %}
+wmm_enabled={{ card_data.get('wmm_enabled') }}
+{%- endif %}
   {%- for ap_name, ap_data in card_data.get('ap_list', {}).iteritems() %}
     {%- if ap_data.bss is defined %}
-bss={{ ap_data.bss }} 
+bss={{ ap_data.bss }}
     {%- endif %}
 {%- if ap_data.bridge is defined %}
 bridge={{ ap_data.bridge }}

@@ -6,7 +6,9 @@ interface={{ card_iface }}
 bridge={{ card_data.bridge }}
 {%- endif %}
 hw_mode={{ card_data.get('hw_mode', 'g') }}
+{%- if card_data.channel is defined %}
 channel={{ card_data.get('channel', '10') }}
+{%- endif %}
 {%- if card_data.ieee80211d is defined %}
 ieee80211d={{ card_data.get('ieee80211d') }}
 {%- endif %}

@@ -24,7 +24,12 @@ ieee80211n={{ card_data.get('ieee80211n') }}
 {%- if card_data.wmm_enabled is defined %}
 wmm_enabled={{ card_data.get('wmm_enabled') }}
 {%- endif %}
-{%- for ap_name, ap_data in card_data.get('ap_list', {}).iteritems() %}
+{#- don't break compatibility with old config format #}
+{%- set ap_list_orig = card_data.get('ap_list', {}) %}
+{%- set ap_list = ap_list_orig.iteritems() if ap_list_orig is mapping else ap_list_orig %}
+{%- for ap in ap_list %}
+{%- set ap_name = ap['ssid'] if ap is mapping else ap[0] %}
+{%- set ap_data = ap if ap is mapping else ap[1] %}
 {%- if ap_data.bss is defined %}
 bss={{ ap_data.bss }}
 {%- endif %}

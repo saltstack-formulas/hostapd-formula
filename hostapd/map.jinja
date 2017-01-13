@@ -11,6 +11,18 @@
         'mode': '600',
         'defaults_file': '/etc/default/hostapd',
     },
+    'Ubuntu': {
+        'pkgs': ['hostapd', 'iw', 'wireless-tools'],
+        'realtek_pkgs': [],
+        'atheros_pkgs': [],
+        'service': 'hostapd',
+        'conf_dir': '/etc/hostapd',
+        'conf_file': 'hostapd.conf',
+        'user': 'root',
+        'group': 'root',
+        'mode': '600',
+        'defaults_file': '/etc/default/hostapd',
+    },
     'FreeBSD': {
         'service': 'hostapd',
         'conf_dir': '/etc',

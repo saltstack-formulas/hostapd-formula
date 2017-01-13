@@ -2,6 +2,9 @@ ctrl_interface=/var/run/hostapd
 ctrl_interface_group=0
 {%- for card_iface, card_data in salt['pillar.get']('hostapd:cardlist', {}).iteritems() %}
 interface={{ card_iface }}
+{%- if card_data.driver is defined %}
+driver={{ card_data.driver }}
+{%- endif %}
 {%- if card_data.bridge is defined %}
 bridge={{ card_data.bridge }}
 {%- endif %}

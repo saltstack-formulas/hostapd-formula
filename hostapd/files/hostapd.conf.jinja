@@ -24,10 +24,10 @@ ieee80211n={{ card_data.get('ieee80211n') }}
 {%- if card_data.wmm_enabled is defined %}
 wmm_enabled={{ card_data.get('wmm_enabled') }}
 {%- endif %}
-  {%- for ap_name, ap_data in card_data.get('ap_list', {}).iteritems() %}
-    {%- if ap_data.bss is defined %}
+{%- for ap_name, ap_data in card_data.get('ap_list', {}).iteritems() %}
+{%- if ap_data.bss is defined %}
 bss={{ ap_data.bss }}
-    {%- endif %}
+{%- endif %}
 {%- if ap_data.bridge is defined %}
 bridge={{ ap_data.bridge }}
 {%- endif %}
@@ -37,5 +37,5 @@ wpa={{ ap_data.get('wpa', '2') }}
 wpa_key_mgmt={{ ap_data.get('wpa_key_mgmt', 'WPA-PSK') }}
 rsn_pairwise={{ ap_data.get('rsn_pairwise', 'CCMP') }}
 wpa_passphrase={{ ap_data.get('wpa_passphrase', '') }}
-  {%- endfor %}
+{%- endfor %}
 {%- endfor %}

@@ -8,7 +8,15 @@
         'conf_file': 'hostapd.conf',
         'user': 'root',
         'group': 'root',
-        'mode': '644',
+        'mode': '600',
         'defaults_file': '/etc/default/hostapd',
+    },
+    'FreeBSD': {
+        'service': 'hostapd',
+        'conf_dir': '/etc',
+        'conf_file': 'hostapd.conf',
+        'user': 'root',
+        'group': 'wheel',
+        'mode': '600',
     },
 }, grain='os', merge=salt['pillar.get']('hostapd:lookup')) %}

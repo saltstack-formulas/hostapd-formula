@@ -2,6 +2,10 @@
 
 {% from "hostapd/map.jinja" import map with context %}
 
+{% macro card2conf(card, map) -%}
+{{ map.conf_dir }}/{{ map.conf_file|replace('.conf', "_{}.conf".format(card)) }}
+{%- endmacro %}
+
 # Install packages
 {%- if map.pkgs is defined %}
 hostapd_pkgs:
@@ -18,7 +22,7 @@ hostapd_pkgs:
 hostapd_activate:
   file.append:
     - name: {{ map.defaults_file }}
-    - text: DAEMON_CONF="{{ map.conf_dir }}/{{ map.conf_file }}"  
+    - text: "DAEMON_CONF='{% for card in salt['pillar.get']('hostapd:cardlist', {}).keys() %}{{ card2conf(card, map) }} {% endfor %}'"
 {%- endif %}      
 
 # Ensure hostapd service is running and autostart is enabled
@@ -27,10 +31,10 @@ hostapd_service:
     - name: {{ map.service }}
     - enable: True
 
-# Deploy hostapd.conf
-hostapd_config:
+{% for card in salt['pillar.get']('hostapd:cardlist', {}).keys() %}
+hostapd_config_{{ card }}:
   file.managed:
-    - name: {{ map.conf_dir }}/{{ map.conf_file }}
+    - name: {{ card2conf(card, map) }}
     - source: salt://hostapd/files/hostapd.conf.jinja
     - template: jinja  
     - user: {{ map.user }}
@@ -38,3 +42,4 @@ hostapd_config:
     - mode: {{ map.mode }}  
     - watch_in:
       - service: hostapd_service
+{% endfor %}

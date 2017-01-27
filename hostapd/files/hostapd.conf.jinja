@@ -1,7 +1,7 @@
 ctrl_interface=/var/run/hostapd
 ctrl_interface_group=0
-{%- for card_iface, card_data in salt['pillar.get']('hostapd:cardlist', {}).iteritems() %}
-interface={{ card_iface }}
+{%- set card_data = salt['pillar.get']("hostapd:cardlist:{}".format(card), {}) %}
+interface={{ card }}
 {%- if card_data.driver is defined %}
 driver={{ card_data.driver }}
 {%- endif %}
@@ -42,5 +42,4 @@ wpa={{ ap_data.get('wpa', '2') }}
 wpa_key_mgmt={{ ap_data.get('wpa_key_mgmt', 'WPA-PSK') }}
 rsn_pairwise={{ ap_data.get('rsn_pairwise', 'CCMP') }}
 wpa_passphrase={{ ap_data.get('wpa_passphrase', '') }}
-{%- endfor %}
 {%- endfor %}

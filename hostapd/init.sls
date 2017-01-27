@@ -37,6 +37,8 @@ hostapd_config_{{ card }}:
     - name: {{ card2conf(card, map) }}
     - source: salt://hostapd/files/hostapd.conf.jinja
     - template: jinja  
+    - context:
+      card: {{ card }}
     - user: {{ map.user }}
     - group: {{ map.group }}
     - mode: {{ map.mode }}  

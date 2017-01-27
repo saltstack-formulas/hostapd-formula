@@ -29,3 +29,24 @@ hostapd:
         myssid3:
           bss: wlan2
           wpa_passphrase: someotherpassword3
+
+      # Alternative non-mixable syntax to define the order of the APs
+      # (In my setup, the first AP had to use the interface as bss.
+      # Therefore I had to put it before all other aps and omit the 'bss' parameter.)
+      ap_list:  # now it's an actual list, if one's pydantic :-)
+        - ssid: myssid1         # the name of the AP
+          auth_algs: 1          # 1=wpa, 2=wep, 3=both
+          wpa: 2                # WPA2 only
+          wpa_key_mgmt: WPA-PSK 
+          rsn_pairwise: CCMP
+          wpa_passphrase: mysupersecretkey
+        - ssid: myssid2
+          bss: wlan1            # the name of the new interface hostapd will create to handle this AP 
+          bridge: br0
+          auth_algs: 1          # 1=wpa, 2=wep, 3=both
+          wpa: 1                # WPA1 only
+          wpa_key_mgmt: WPA-PSK 
+          wpa_passphrase: someotherpassword
+        - ssid: myssid3
+          bss: wlan2
+          wpa_passphrase: someotherpassword3

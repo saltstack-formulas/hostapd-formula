@@ -2,6 +2,9 @@ ctrl_interface=/var/run/hostapd
 ctrl_interface_group=0
 {%- for card_iface, card_data in salt['pillar.get']('hostapd:cardlist', {}).iteritems() %}
 interface={{ card_iface }}
+{%- if card_data.driver is defined %}
+driver={{ card_data.driver }}
+{%- endif %}
 {%- if card_data.bridge is defined %}
 bridge={{ card_data.bridge }}
 {%- endif %}
@@ -21,10 +24,15 @@ ieee80211n={{ card_data.get('ieee80211n') }}
 {%- if card_data.wmm_enabled is defined %}
 wmm_enabled={{ card_data.get('wmm_enabled') }}
 {%- endif %}
-  {%- for ap_name, ap_data in card_data.get('ap_list', {}).iteritems() %}
-    {%- if ap_data.bss is defined %}
+{#- don't break compatibility with old config format #}
+{%- set ap_list_orig = card_data.get('ap_list', {}) %}
+{%- set ap_list = ap_list_orig.iteritems() if ap_list_orig is mapping else ap_list_orig %}
+{%- for ap in ap_list %}
+{%- set ap_name = ap['ssid'] if ap is mapping else ap[0] %}
+{%- set ap_data = ap if ap is mapping else ap[1] %}
+{%- if ap_data.bss is defined %}
 bss={{ ap_data.bss }}
-    {%- endif %}
+{%- endif %}
 {%- if ap_data.bridge is defined %}
 bridge={{ ap_data.bridge }}
 {%- endif %}
@@ -34,5 +42,5 @@ wpa={{ ap_data.get('wpa', '2') }}
 wpa_key_mgmt={{ ap_data.get('wpa_key_mgmt', 'WPA-PSK') }}
 rsn_pairwise={{ ap_data.get('rsn_pairwise', 'CCMP') }}
 wpa_passphrase={{ ap_data.get('wpa_passphrase', '') }}
-  {%- endfor %}
+{%- endfor %}
 {%- endfor %}

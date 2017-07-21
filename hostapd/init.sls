@@ -20,9 +20,10 @@ hostapd_pkgs:
 
 {%- if map.defaults_file is defined %}
 hostapd_activate:
-  file.append:
+  file.replace:
     - name: {{ map.defaults_file }}
-    - text: "DAEMON_CONF='{% for card in salt['pillar.get']('hostapd:cardlist', {}).keys() %}{{ card2conf(card, map) }} {% endfor %}'"
+    - pattern: "^DAEMON_CONF=.*$"
+    - repl: "DAEMON_CONF='{% for card in salt['pillar.get']('hostapd:cardlist', {}).keys() %}{{ card2conf(card, map) }} {% endfor %}'"
 {%- endif %}      
 
 # Ensure hostapd service is running and autostart is enabled

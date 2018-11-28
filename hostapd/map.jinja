@@ -1,34 +1,17 @@
-{% set map = salt['grains.filter_by']({
-    'Debian': {
-        'pkgs': ['hostapd', 'iw', 'wireless-tools'],
-        'realtek_pkgs': ['firmware-realtek'],
-        'atheros_pkgs': ['firmware-atheros'],
-        'service': 'hostapd',
-        'conf_dir': '/etc/hostapd',
-        'conf_file': 'hostapd.conf',
-        'user': 'root',
-        'group': 'root',
-        'mode': '600',
-        'defaults_file': '/etc/default/hostapd',
-    },
-    'Ubuntu': {
-        'pkgs': ['hostapd', 'iw', 'wireless-tools'],
-        'realtek_pkgs': [],
-        'atheros_pkgs': [],
-        'service': 'hostapd',
-        'conf_dir': '/etc/hostapd',
-        'conf_file': 'hostapd.conf',
-        'user': 'root',
-        'group': 'root',
-        'mode': '600',
-        'defaults_file': '/etc/default/hostapd',
-    },
-    'FreeBSD': {
-        'service': 'hostapd',
-        'conf_dir': '/etc',
-        'conf_file': 'hostapd.conf',
-        'user': 'root',
-        'group': 'wheel',
-        'mode': '600',
-    },
-}, grain='os', merge=salt['pillar.get']('hostapd:lookup')) %}
+{% import_yaml "hostapd/defaults.yaml" as defaults %}
+{% import_yaml "hostapd/osfamilymap.yaml" as osfamilymap %}
+{% import_yaml "hostapd/osmap.yaml" as osmap %}
+
+{%- set map = salt['grains.filter_by'](
+    defaults,
+    merge=salt['grains.filter_by'](
+        osfamilymap,
+        grain='os_family',
+        merge=salt['grains.filter_by'](
+            osmap,
+            grain='os',
+            merge=salt['pillar.get']('hostapd:lookup', {}),
+        ),
+    ),
+    base='hostapd')
+%}

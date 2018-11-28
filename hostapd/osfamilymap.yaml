@@ -1,0 +1,9 @@
+Debian:
+  pkgs: ['hostapd', 'iw', 'wireless-tools']
+  realtek_pkgs: ['firmware-realtek']
+  atheros_pkgs: ['firmware-atheros']
+Ubuntu:
+  pkgs: ['hostapd', 'iw', 'wireless-tools']
+FreeBSD:
+  conf_dir: /etc
+  group: wheel

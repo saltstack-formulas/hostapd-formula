@@ -1,0 +1,11 @@
+hostapd:
+  pkgs: []
+  realtek_pkgs: []
+  atheros_pkgs: []
+  mode: '600'
+  user: root
+  group: root
+  conf_dir: /etc/hostapd
+  conf_file: hostapd.conf
+  service: hostapd
+  defaults_file: /etc/default/hostapd

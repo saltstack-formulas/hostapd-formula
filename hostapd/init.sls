@@ -19,11 +19,16 @@ hostapd_pkgs:
 {%- endif %}      
 
 {%- if map.defaults_file is defined %}
+{%-   set daemon_conf = [] %}
+{%-   for card in salt['pillar.get']('hostapd:cardlist', {}) %}
+{%-     set entry %}{{ card2conf(card, map) }}{% endset %}
+{%-     do daemon_conf.append(entry) %}
+{%-   endfor %}
 hostapd_activate:
   file.replace:
     - name: {{ map.defaults_file }}
     - pattern: "^(|#)DAEMON_CONF=.*$"
-    - repl: "DAEMON_CONF='{% for card in salt['pillar.get']('hostapd:cardlist', {}).keys() %}{{ card2conf(card, map) }} {% endfor %}'"
+    - repl: "DAEMON_CONF='{{ daemon_conf|join(" ") }}'"
     - watch_in:
       - service: hostapd_service
 {%- endif %}      

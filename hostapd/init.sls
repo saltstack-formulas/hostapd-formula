@@ -27,8 +27,8 @@ hostapd_pkgs:
 hostapd_activate:
   file.replace:
     - name: {{ map.defaults_file }}
-    - pattern: "^(|#)DAEMON_CONF=.*$"
-    - repl: "DAEMON_CONF='{{ daemon_conf.values()|join(" ") }}'"
+    - pattern: ^(|#)DAEMON_CONF=.*$
+    - repl: DAEMON_CONF='{{ daemon_conf.values()|join(" ") }}'
     - watch_in:
       - service: hostapd_service
 {%- endif %}      

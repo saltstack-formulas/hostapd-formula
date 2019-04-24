@@ -1,6 +1,5 @@
 ctrl_interface=/var/run/hostapd
 ctrl_interface_group=0
-{%- set card_data = salt['pillar.get']("hostapd:cardlist:{}".format(card), {}) %}
 interface={{ card }}
 {%- if card_data.driver is defined %}
 driver={{ card_data.driver }}

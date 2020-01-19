@@ -6,7 +6,7 @@
 {%- set daemon_conf = {} %}
 {%- set card_conf = {} %}
 {%- for card, data in salt['pillar.get']('hostapd:cardlist', {})|dictsort %}
-{%-   set cfg_file = '%s/%s_%s.conf'|format(map.conf_dir, map.conf_file|replace('.conf', ''), card) %}
+{%-   set cfg_file = '%s/%s.conf'|format(map.conf_dir, card) %}
 {%-   do daemon_conf.update({card: cfg_file}) %}
 {%-   do card_conf.update({card: data}) %}
 {%- endfor %}
@@ -24,16 +24,34 @@ hostapd_pkgs:
 {%- endif %}      
 
 {%- if map.defaults_file is defined %}
-hostapd_activate:
-  file.replace:
+hostapd_defaults_file:
+  file.managed:
     - name: {{ map.defaults_file }}
-    - pattern: ^(|#)DAEMON_CONF=.*$
-    - repl: DAEMON_CONF='{{ daemon_conf.values()|join(" ") }}'
+    - source: salt://hostapd/files/defaults.jinja
+    - template: jinja
+    - context:
+        daemon_conf: {{ daemon_conf | json }}
     - watch_in:
       - service: hostapd_service
+
+hostapd_systemd_unit_addition:
+  file.managed:
+    - name: /etc/systemd/system/hostapd.service.d/multi-interface.conf
+    - makedirs: True
+    - contents: |
+        [Service]
+        ExecStart=
+        ExecStart=/usr/sbin/hostapd -P /run/hostapd.pid -B $DAEMON_OPTS{% for card in daemon_conf.keys() %} ${DAEMON_CONF_{{ card }}}{% endfor %}
+
+hostapd_systemd_reload:
+  cmd.run:
+    - name: systemctl daemon-reload
+    - onchanges:
+      - file:  hostapd_systemd_unit_addition
 {%- endif %}      
 
-# Ensure hostapd service is running and autostart is enabled
+
+# Ensure hostapd.service is stopped and autostart is disabled
 hostapd_service:
   service.running:
     - name: {{ map.service }}

@@ -6,7 +6,7 @@
 {%- set daemon_conf = {} %}
 {%- set card_conf = {} %}
 {%- for card, data in salt['pillar.get']('hostapd:cardlist', {})|dictsort %}
-{%-   set cfg_file = '%s/%s_%s.conf'|format(map.conf_dir, map.conf_file|replace('.conf', ''), card) %}
+{%-   set cfg_file = '%s/%s.conf'|format(map.conf_dir, card) %}
 {%-   do daemon_conf.update({card: cfg_file}) %}
 {%-   do card_conf.update({card: data}) %}
 {%- endfor %}
@@ -24,20 +24,23 @@ hostapd_pkgs:
 {%- endif %}      
 
 {%- if map.defaults_file is defined %}
-hostapd_activate:
-  file.replace:
+hostapd_defaults_file:
+  file.managed:
     - name: {{ map.defaults_file }}
-    - pattern: ^(|#)DAEMON_CONF=.*$
-    - repl: DAEMON_CONF='{{ daemon_conf.values()|join(" ") }}'
+    - source: salt://hostapd/files/defaults.jinja
+    - template: jinja
+    - context:
+        daemon_conf: {{ daemon_conf | json }}
     - watch_in:
       - service: hostapd_service
 {%- endif %}      
 
-# Ensure hostapd service is running and autostart is enabled
+
+# Ensure hostapd.service is stopped and autostart is disabled
 hostapd_service:
-  service.running:
+  service.dead:
     - name: {{ map.service }}
-    - enable: True
+    - enable: False
 
 {% for card, conf in daemon_conf|dictsort %}
 hostapd_config_{{ card }}:
@@ -51,6 +54,11 @@ hostapd_config_{{ card }}:
     - user: {{ map.user }}
     - group: {{ map.group }}
     - mode: {{ map.mode }}  
-    - watch_in:
-      - service: hostapd_service
+
+hostapd_service_{{ card }}:
+  service.running:
+    - name: {{ map.service }}@{{ card }}
+    - enable: True
+    - watch:
+      - file: hostapd_config_{{ card }}
 {% endfor %}

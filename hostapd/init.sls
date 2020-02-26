@@ -51,11 +51,16 @@ hostapd_systemd_reload:
 {%- endif %}      
 
 
-# Ensure hostapd.service is stopped and autostart is disabled
+hostapd_service_unmask:
+  service.unmasked:
+    - name: {{ map.service }}
+
 hostapd_service:
   service.running:
     - name: {{ map.service }}
     - enable: True
+    - require:
+      - service: hostapd_service_unmask
 
 {% for card, conf in daemon_conf|dictsort %}
 hostapd_config_{{ card }}:
